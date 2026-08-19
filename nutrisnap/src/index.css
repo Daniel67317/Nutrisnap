@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+
+/* ── Sistema de tokens NutriSnap ──────────────────────────────────────────
+   Tailwind v4 lee estas variables y genera utilidades automáticamente:
+   --color-surface  →  bg-surface / text-surface / border-surface
+   ------------------------------------------------------------------------ */
+@theme {
+  /* Fondos y superficies */
+  --color-void: #0a0a0a; /* fondo raíz de la app */
+  --color-surface: #1a1a1a; /* tarjetas sólidas */
+  --color-surface-2: #232323; /* tarjetas elevadas / inputs */
+  --color-hairline: #2e2e2e; /* bordes de 1px */
+
+  /* Texto */
+  --color-ink: #f5f5f4; /* texto principal */
+  --color-ink-soft: #a1a1a0; /* texto secundario */
+  --color-ink-faint: #6b6b6a; /* metadatos, disclaimers */
+
+  /* Acentos de marca */
+  --color-mint: #10b981; /* verde esmeralda — acción, proteína, éxito */
+  --color-mint-deep: #059669;
+  --color-ember: #f97316; /* naranja — energía, calorías */
+
+  /* Macros (cada macro tiene identidad cromática fija en toda la app) */
+  --color-macro-protein: #10b981;
+  --color-macro-carbs: #f97316;
+  --color-macro-fat: #a78bfa;
+
+  /* Tipografía */
+  --font-display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Radios: la app entera vive en rounded-3xl salvo píldoras */
+  --radius-3xl: 1.5rem;
+
+  /* Curvas de animación compartidas con Framer Motion (ver lib/motion.ts) */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    /* Hace que scrollbars, selects y el teclado nativo salgan en oscuro. */
+    color-scheme: dark;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-void text-ink font-sans antialiased;
+    /* Fuera del "teléfono" (escritorio) se ve un degradado ambiental */
+    background-image:
+      radial-gradient(60rem 40rem at 15% -10%, rgba(16, 185, 129, 0.1), transparent 60%),
+      radial-gradient(50rem 35rem at 95% 5%, rgba(249, 115, 22, 0.07), transparent 55%);
+    background-attachment: fixed;
+    overscroll-behavior-y: none;
+  }
+
+  /* Números tabulares en todo dato nutricional: evita el "baile" de dígitos
+     cuando los macros se recalculan en vivo. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* Foco visible y consistente (accesibilidad, no negociable) */
+  :focus-visible {
+    outline: 2px solid var(--color-mint);
+    outline-offset: 2px;
+    border-radius: 0.75rem;
+  }
+
+  ::selection {
+    background: rgba(16, 185, 129, 0.3);
+  }
+
+  /* Scrollbars discretas */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-hairline) transparent;
+  }
+}
+
+@layer components {
+  /* Glassmorphism sutil: la superficie base de casi toda la UI.
+     Clave: es SUTIL — 8% de blanco, borde de 1px al 8%, blur medio.
+     Nada de blur exagerado que se lea como "efecto". */
+  .glass {
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.07) 0%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  /* Variante seleccionada: el borde toma el acento y aparece un halo interno */
+  .glass-active {
+    background: linear-gradient(
+      160deg,
+      rgba(16, 185, 129, 0.16) 0%,
+      rgba(16, 185, 129, 0.05) 100%
+    );
+    border-color: rgba(16, 185, 129, 0.55);
+    box-shadow:
+      0 0 0 1px rgba(16, 185, 129, 0.25),
+      0 8px 32px -12px rgba(16, 185, 129, 0.45);
+  }
+  /* Slider de gramos del analizador. El control nativo en modo oscuro es
+     casi invisible y el pulgar por defecto es demasiado pequeño para el
+     dedo: 22px es el mínimo cómodo. */
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 22px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .slider::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .slider::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-top: -8px;
+    height: 22px;
+    width: 22px;
+    border-radius: 999px;
+    background: var(--color-mint);
+    border: 3px solid var(--color-void);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.55);
+  }
+
+  .slider::-moz-range-thumb {
+    height: 22px;
+    width: 22px;
+    border-radius: 999px;
+    background: var(--color-mint);
+    border: 3px solid var(--color-void);
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.55);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
