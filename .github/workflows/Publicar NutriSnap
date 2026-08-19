@@ -17,18 +17,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Descomprimir el proyecto
+        run: unzip -o nutrisnap-beta-0.1.zip
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+
       - run: npm install
+        working-directory: nutrisnap
+
       - run: npm run build
+        working-directory: nutrisnap
         env:
           VITE_BASE: /${{ github.event.repository.name }}/
           VITE_FEEDBACK_ENDPOINT: ${{ secrets.VITE_FEEDBACK_ENDPOINT }}
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: nutrisnap/dist
 
   desplegar:
     needs: construir
